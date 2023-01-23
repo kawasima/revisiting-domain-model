@@ -21,7 +21,7 @@ class Cart {
             .map(item => item.quantity)
             .reduce((prev, cur) => prev + cur);
         
-        return total > Cart.UPPER_BOUND;
+        return total <= Cart.UPPER_BOUND;
     }
 
     add(productId: ProductId, quantity: Quantity): void {
