@@ -1,46 +1,19 @@
-import { randomUUID } from "crypto";
+import { z } from "zod";
 
-export class ProductId {
-    private value: string;
-    constructor(value: string) {
-        this.value = value;
-    }
-}
+export const CartId = z.string().uuid();
+export type CartId = z.infer<typeof CartId>;
 
-export class CartId {
-    private value: string;
-    constructor(value?: string) {
-        this.value = value || randomUUID();
-    }
-}
+export const ProductId = z.string().uuid();
+export type ProductId = z.infer<typeof ProductId>;
 
-export class CartItemId {
-    private value: string;
-    constructor(value?: string) {
-        this.value = value || randomUUID();
-    }
-}
+export const CartItemId = z.string().uuid();
+export type CartItemId = z.infer<typeof CartItemId>;
 
+export const UserId = z.string().uuid();
+export type UserId = z.infer<typeof UserId>;
 
-export class Quantity {
-    private value: number;
-    constructor(value: number) {
-        this.value = value;
-    }
-    add(acc: Quantity): Quantity {
-        return new Quantity(acc.value + this.value)
-    }
-    asNumber(): number {
-        return this.value;
-    }
-}
-
-export class UserId {
-    private value: string;
-    constructor(value: string) {
-        this.value = value;
-    }
-}
+export const Quantity = z.number().positive();
+export type Quantity = z.infer<typeof Quantity>;
 
 export type Page<T> = {
     total: number;
@@ -48,6 +21,7 @@ export type Page<T> = {
     sze: number;
     items: T;
 }
+
 export type CartItem = {
     productId: ProductId;
     quantity: Quantity;

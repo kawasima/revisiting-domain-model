@@ -15,14 +15,9 @@ class CartForUpdate {
         this.owner = owner;
     }
 
-    public isValid(cartRepository: CartWriteRepository): boolean {
-        const total = cartRepository.getItemCount();
-        
-    }
-
     add(productId: ProductId, quantity: Quantity, cartRepository: CartWriteRepository): void { 
         const total = cartRepository.getItemCount();
-        if (total + quantity.asNumber() > CartForUpdate.UPPER_BOUND) {
+        if (total + quantity > CartForUpdate.UPPER_BOUND) {
             throw new Error(`商品数の上限に達しています`)
         }
     }
@@ -30,7 +25,7 @@ class CartForUpdate {
 
 class Cart {
     items(page: number, cartRepository: CartReadRepository) {
-        return cartRepository.findCartItemsByPage();
+        return cartRepository.findCartItemsByPage(page);
     }
 }
 
@@ -54,13 +49,13 @@ function addItemToCartUseCase(
     cartRepository: CartWriteRepository,
     productRepository: ProductRepository) {
     return (command: AddItemToCartCommand) => {
-        const userId = new UserId(command.userId);
+        const userId = UserId.parse(command.userId);
         const cart = cartRepository.loadCart(userId);
-        const productId = new ProductId(command.productId);
+        const productId = ProductId.parse(command.productId);
         if (!productRepository.isNowOnSale(productId)) {
             throw Error(`販売が終了しました`);
         };
-        const quantity = new Quantity(command.quantity);
+        const quantity = Quantity.parse(command.quantity);
         cart.add(productId, quantity, cartRepository);
     }
 }

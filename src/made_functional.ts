@@ -1,26 +1,30 @@
 import {
     AddItemToCartCommand,
-    CartId,
     Page,
-    ProductId,
-    Quantity,
     UserId,
+    CartId,
+    ProductId,
+    Quantity
 } from './share';
+import { z } from "zod";
 
-type Cart = {
-    id: CartId;
-}
+const Cart = z.object({
+    id: CartId
+})
+type Cart = z.infer<typeof Cart>
 
 type cartItems = (cart: Cart, page: number) => Page<CartItem>
 
 type OnSaleProduct = {
     id: ProductId
 }
-type CartItem = {
-    cartId: CartId;
-    productId: ProductId;
-    quantity: Quantity;
-}
+const CartItem = z.object({
+    cartId: CartId,
+    productId: ProductId,
+    quantity: Quantity,
+});
+type CartItem = z.infer<typeof CartItem>
+
 type AddableCartItem = {
     isNew: boolean;
     cartId: CartId;
@@ -48,12 +52,11 @@ interface ProductRepository {
 }
 
 const parseCartItem: ParseCartItem = (command: AddItemToCartCommand, cart: Cart) => {
-    // ほんとは各々バリデーションしながら型変換する。ここでは省略。
-    return {
-        cartId: new CartId(command.userId),
-        productId: new ProductId(command.productId),
-        quantity: new Quantity(command.quantity),
-    }
+    return CartItem.parse({
+        cartId: CartId.parse(command.userId),
+        productId: ProductId.parse(command.productId),
+        quantity: Quantity.parse(command.quantity),
+    })
 }
 
 // 本当はもっと小さなFunctionに分解すべき
@@ -62,7 +65,7 @@ function parseAddableCartItem(
     productRepository: ProductRepository,
 ): ParseAddableCartItem {
     return (cartItem: CartItem) => {
-        if (cartRepository.getItemCount(cartItem.cartId) + cartItem.quantity.asNumber() > 10000) {
+        if (cartRepository.getItemCount(cartItem.cartId) + cartItem.quantity > 10000) {
             throw Error(`商品数の上限に達しています`)
         }
         return {
@@ -103,7 +106,7 @@ function addItemToCartUseCase(
     productRepository: ProductRepository,
 ) {
     return (command: AddItemToCartCommand) => {
-        const cart = fetchCart(cartRepository)(new UserId(command.userId));
+        const cart = fetchCart(cartRepository)(UserId.parse(command.userId));
         const cartItem = parseCartItem(command, cart);
         const addableCartItem = parseAddableCartItem(cartRepository, productRepository)(cartItem);
         saveCartItem(cartItemRepository)(addableCartItem);

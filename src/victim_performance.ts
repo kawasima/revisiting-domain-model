@@ -18,7 +18,7 @@ class Cart {
 
     private isValid(): boolean {
         const total = this.items
-            .map(item => item.quantity.asNumber())
+            .map(item => item.quantity)
             .reduce((prev, cur) => prev + cur);
         
         return total > Cart.UPPER_BOUND;
@@ -29,7 +29,7 @@ class Cart {
         if (item === undefined) {
             this.items.push({ productId, quantity })
         } else {
-            item.quantity = item?.quantity.add(quantity);
+            item.quantity = item?.quantity + quantity;
         }
         if (!this.isValid()) {
             throw new Error(`商品数の上限に達しています`)
@@ -52,13 +52,13 @@ function addItemToCartUseCase(
     cartRepository: CartRepository,
     productRepository: ProductRepository) {
     return (command: AddItemToCartCommand) => {
-        const userId = new UserId(command.userId);
-        const productId = new ProductId(command.productId);
+        const userId = UserId.parse(command.userId);
+        const productId = ProductId.parse(command.productId);
         if (!productRepository.isNowOnSale(productId)) {
             throw Error(`販売が終了しました`);
         };
         const cart = cartRepository.loadCart(userId);
-        const quantity = new Quantity(command.quantity);
+        const quantity = Quantity.parse(command.quantity);
         cart.add(productId, quantity);
     }
 }
