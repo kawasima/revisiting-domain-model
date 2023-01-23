@@ -4,26 +4,8 @@ import {
     CartItem,
     UserId,
     AddItemToCartCommand,
+    CartId,
  } from './share'
-
-// 性能を犠牲にせず、かつドメイン層に外界とのやり取りを持ち込まないようにする
-class Cart {
-    private items: CartItem[];
-    public static UPPER_BOUND: number = 10000;
-
-    constructor(items: CartItem[]|undefined) {
-        this.items = items || [];
-        this.isValid();
-    }
-
-    private isValid(): boolean {
-        const total = this.items
-            .map(item => item.quantity)
-            .reduce((prev, cur) => prev + cur);
-        
-        return total > Cart.UPPER_BOUND;
-    }
-}
 
 interface CartRepository {
     getItemCount(userId: UserId): number;
@@ -36,7 +18,15 @@ interface ProductRepository {
     isNowOnSale(productId: ProductId): boolean;
 }
 
-type AddItemToCartUseCase = (command: AddItemToCartCommand) => void;
+// 性能を犠牲にせず、かつドメイン層に外界とのやり取りを持ち込まないようにする
+class Cart {
+    private id: CartId;
+    public static UPPER_BOUND: number = 10000;
+
+    constructor(id: CartId) {
+        this.id = id;
+    }
+}
 
 function addItemToCartUseCase(
     cartRepository: CartRepository,

@@ -5,6 +5,7 @@ import {
     UserId,
     Page,
     AddItemToCartCommand,
+    CartId,
  } from './share'
 
 // 性能を犠牲にせず、かつドメイン層にあるべき責務をドメインレイヤで実装する
@@ -18,9 +19,9 @@ import {
  */
 class CartForUpdate {
     private static UPPER_BOUND: number = 10000;
-    private owner: UserId;
-    constructor(owner: UserId) {
-        this.owner = owner;
+    private id: CartId;
+    constructor(id: CartId) {
+        this.id = id;
     }
 
     add(productId: ProductId, quantity: Quantity, cartRepository: CartWriteRepository): void { 
@@ -36,6 +37,11 @@ class CartForUpdate {
 }
 
 class Cart {
+    private id: CartId;
+    constructor(id: CartId) {
+        this.id = id;
+    }
+    
     items(page: number, cartRepository: CartReadRepository) {
         return cartRepository.findCartItemsByPage(page);
     }
