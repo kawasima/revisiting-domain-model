@@ -61,5 +61,6 @@ export function addItemToCartUseCase(
         const cart = cartRepository.loadCart(userId);
         const quantity = Quantity.parse(command.quantity);
         cart.add(productId, quantity);
+        cartRepository.saveCart(cart);
     }
 }
