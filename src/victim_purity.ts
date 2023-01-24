@@ -17,7 +17,7 @@ import {
  * ↓
  * ので、更新用と参照用を分けて、更新時の不変条件チェックを全アイテムロードすることなく実施する
  */
-class CartForUpdate {
+export class CartForUpdate {
     private static UPPER_BOUND: number = 10000;
     private id: CartId;
     constructor(id: CartId) {
@@ -36,35 +36,35 @@ class CartForUpdate {
     }
 }
 
-class Cart {
+export class Cart {
     private id: CartId;
     constructor(id: CartId) {
         this.id = id;
     }
-    
+
     items(page: number, cartRepository: CartReadRepository) {
         return cartRepository.findCartItemsByPage(page);
     }
 }
 
-interface CartWriteRepository {
+export interface CartWriteRepository {
     loadCart(userId: UserId): CartForUpdate;
     saveCart(cart: CartForUpdate): void;
     getItemCount(): number;
-    addItem(cart: CartItem): void;
+    addItem(cartItem: CartItem): void;
 }
 
-interface CartReadRepository {
+export interface CartReadRepository {
     findCartItemsByPage(userId: number): Page<CartItem>;
 }
 
-interface ProductRepository {
+export interface ProductRepository {
     isNowOnSale(productId: ProductId): boolean;
 }
 
 type AddItemToCartUseCase = (command: AddItemToCartCommand) => void;
 
-function addItemToCartUseCase(
+export function addItemToCartUseCase(
     cartRepository: CartWriteRepository,
     productRepository: ProductRepository) {
     return (command: AddItemToCartCommand) => {
@@ -73,7 +73,7 @@ function addItemToCartUseCase(
         const productId = ProductId.parse(command.productId);
         if (!productRepository.isNowOnSale(productId)) {
             throw Error(`販売が終了しました`);
-        };
+        }
         const quantity = Quantity.parse(command.quantity);
         cart.add(productId, quantity, cartRepository);
     }

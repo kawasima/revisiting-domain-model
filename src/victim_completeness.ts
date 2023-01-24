@@ -7,19 +7,19 @@ import {
     CartId,
  } from './share'
 
-interface CartRepository {
-    getItemCount(userId: UserId): number;
-    loadCart(): Cart;
+export interface CartRepository {
+    getItemCount(cartId: CartId): number;
+    loadCart(userId: UserId): Cart;
     saveCart(cart: Cart): void;
     addItem(productId: ProductId, quantity: Quantity): void;
 }
 
-interface ProductRepository {
+export interface ProductRepository {
     isNowOnSale(productId: ProductId): boolean;
 }
 
 // 性能を犠牲にせず、かつドメイン層に外界とのやり取りを持ち込まないようにする
-class Cart {
+export class Cart {
     private id: CartId;
     public static UPPER_BOUND: number = 10000;
 
@@ -28,7 +28,7 @@ class Cart {
     }
 }
 
-function addItemToCartUseCase(
+export function addItemToCartUseCase(
     cartRepository: CartRepository,
     productRepository: ProductRepository) {
     return (command: AddItemToCartCommand) => {

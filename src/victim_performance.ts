@@ -7,11 +7,12 @@ import {
 } from './share'
 
 // 純粋性と完全性を両立させた設計
-class Cart {
-    private items: CartItem[];
-    private static UPPER_BOUND: number = 10000;
+export class Cart {
+    readonly items: CartItem[];
+    // ここの数を増やすと危険なので、触らないこと！ (コメント例)
+    private static UPPER_BOUND: number = 100;
 
-    constructor(items: CartItem[]|undefined) {
+    constructor(items?: CartItem[]) {
         this.items = items || [];
         this.isValid();
     }
@@ -19,7 +20,7 @@ class Cart {
     private isValid(): boolean {
         const total = this.items
             .map(item => item.quantity)
-            .reduce((prev, cur) => prev + cur);
+            .reduce((prev, cur) => prev + cur, 0);
         
         return total <= Cart.UPPER_BOUND;
     }
@@ -37,18 +38,18 @@ class Cart {
     }
 }
 
-interface CartRepository {
+export interface CartRepository {
     loadCart(userId: UserId): Cart;
     saveCart(cart: Cart): void;
 }
 
-interface ProductRepository {
+export interface ProductRepository {
     isNowOnSale(productId: ProductId): boolean;
 }
 
 type AddItemToCartUseCase = (command: AddItemToCartCommand) => void;
 
-function addItemToCartUseCase(
+export function addItemToCartUseCase(
     cartRepository: CartRepository,
     productRepository: ProductRepository) {
     return (command: AddItemToCartCommand) => {

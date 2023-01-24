@@ -4,7 +4,7 @@ import {
     UserId,
     CartId,
     ProductId,
-    Quantity
+    Quantity,
 } from './share';
 import { z } from "zod";
 
@@ -37,17 +37,18 @@ type ParseAddableCartItem = (cartItem: CartItem) => AddableCartItem
 type SaveCartItem = (cartItem: AddableCartItem) => void
 type FetchCart = (userId: UserId) => Cart
 
-interface CartRepository {
+export interface CartRepository {
     load: (userId: UserId) => Cart;
     getItemCount: (cartId: CartId) => number;
     isInCart: (cartId: CartId, productId: ProductId) => boolean;
 }
 
-interface CartItemRepository {
+export interface CartItemRepository {
     insert: (cartItem: CartItem) => void;
     update: (cartItem: CartItem) => void;
 }
-interface ProductRepository {
+
+export interface ProductRepository {
     findOnSale: (productId: ProductId) => OnSaleProduct;
 }
 
@@ -100,7 +101,7 @@ function fetchCart(cartRepository: CartRepository): FetchCart {
     }
 }
 
-function addItemToCartUseCase(
+export function addItemToCartUseCase(
     cartRepository: CartRepository,
     cartItemRepository: CartItemRepository,
     productRepository: ProductRepository,
