@@ -54,9 +54,9 @@ export interface ProductRepository {
 
 const parseCartItem: ParseCartItem = (command: AddItemToCartCommand, cart: Cart) => {
     return CartItem.parse({
-        cartId: CartId.parse(command.userId),
-        productId: ProductId.parse(command.productId),
-        quantity: Quantity.parse(command.quantity),
+        cartId: command.userId,
+        productId: command.productId,
+        quantity: command.quantity,
     })
 }
 
